@@ -35,12 +35,42 @@ export default {
             })
     },
     methods: {
+        fetchPosts() {
+            axios.get(`${this.baseUrl}/posts`)
+                .then(response => {
+                    this.posts = response.data
+                    console.log(this.posts);
+                })
+                .catch(error => {
+                    this.posts = [{ entry: 'There was an error: ' + error.message }]
+                });
+        },
         editPost(id) {
-            
+            this.showEditPost = true;
+            const post = this.posts.find(post => post.id === id);
+            this.editPostId = id;
+            this.entry = post.entry;
+            this.mood = post.mood;
         },
         updatePost(event) {
-            
-        }
+            event.preventDefault();
+            const updatedPost = {
+                entry: this.entry,
+                mood: this.mood
+            };
+            axios.post(`${this.baseUrl}/updatePost?id=${this.editPostId}`, updatedPost)
+                .then(response => {
+                    this.fetchPosts(); // Refresh the posts list cause we stop the refresh of the page with preventDefault
+                    this.showEditPost = false; //need to hide the edit form
+                    this.entry = "";
+                    this.mood = "";
+                    this.editPostId = "";
+                })
+                .catch(error => {
+                    console.error('Error updating post:', error);
+                });
+        },
+        
     }
 }
 </script>
@@ -61,7 +91,7 @@ export default {
                     <td>{{ post.id }}</td>
                     <td>{{ post.entry }}</td>
                     <td>{{ post.mood }}</td>
-                    <td><button>Edit</button></td>
+                    <td><button @click="editPost(post.id)">Edit</button></td>
                 </tr>
             </tbody>
 
@@ -70,7 +100,7 @@ export default {
         <div id="editPost" v-if="showEditPost">
             <h3>Edit Post</h3>
             <div id="postContent" class="mx-3">
-                <form>
+                <form @submit="updatePost">
                     <div class="mb-3">
                         <label for="entry" class="form-label">Entry</label>
                         <textarea id="entry" class="form-control" v-model="entry" required></textarea>
