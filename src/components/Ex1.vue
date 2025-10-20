@@ -4,17 +4,17 @@
         // Note: DO NOT USE "eval()". In security, "eval" is considered "evil"!!!
         data() {
             return {
-                x: '',
-                y: '',
-                operators: ['+','-','*','/','%'],
-                selectedOp: '',
+                x: '', //set initial vvalue as empty and to get the input value
+                y: '', // same as x
+                operators: ['+','-','*','/','%'], // data to populate the dropdown
+                selectedOp: '', // the operator that we take in cos v-model bind
             }
         },
         computed: {
             result() {
                 const x = this.x;
                 const y = this.y;
-                
+                // since no eval(), manually do operations
                 switch(this.selectedOp){
                     case '+': return x+y;
                     case '-': return x-y; 
